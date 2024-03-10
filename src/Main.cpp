@@ -76,52 +76,58 @@ void Main()
 
 void Main()
 {
-	// クッキーの絵文字
+	Scene::SetResizeMode(ResizeMode::Keep);
+	Window::SetStyle(WindowStyle::Sizable);
+	// テクスチャー
 	const Texture texture{ U"example/planet05.png" };
 
 	// フォント
 	const Font font{ FontMethod::MSDF, 48, Typeface::Bold };
 
-	// クッキーのクリック円
-	const Circle cookieCircle{ 170, 300, 100 };
+	// テクスチャークリック範囲
+	const Circle texture_cricle{ Scene::Center().x, Scene::Center().y, 100};
 
-	// クッキーの表示サイズ（倍率）
-	double cookieScale = 0.1;
+	//表示サイズ（倍率）
+	double texture_size = 0.1;
 
 	// クッキーの個数
 	double cookies = 0;
 
 	while (System::Update())
 	{
-		// クッキー円上にマウスカーソルがあれば
-		if (cookieCircle.mouseOver())
+		if (KeyF11.up() == true) {
+			Window::SetFullscreen( ( Window::GetState().fullscreen == false ? true : false) );
+		}
+
+		// 円上にマウスカーソルがあれば
+		if (texture_cricle.mouseOver())
 		{
 			Cursor::RequestStyle(CursorStyle::Hand);
 		}
 
-		// クッキー円が左クリックされたら
-		if (cookieCircle.leftClicked())
+		// 左クリックされたら
+		if (texture_cricle.leftClicked())
 		{
-			cookieScale = 0.1;
+			texture_size = 0.1;
 			++cookies;
 		}
 
-		// クッキーの表示サイズを回復する
-		cookieScale += Scene::DeltaTime();
+		// 表示サイズを回復する
+		texture_size += Scene::DeltaTime();
 
-		if (0.3 < cookieScale)
+		if (0.3 < texture_size)
 		{
-			cookieScale = 0.3;
+			texture_size = 0.3;
 		}
 
 		// 背景を描く
 		Rect{ 0, 0, 800, 600 }.draw(Arg::top = ColorF{ 0.6, 0.5, 0.3 }, Arg::bottom = ColorF{ 0.2, 0.5, 0.3 });
 
-		// クッキーの数を整数で表示する
-		font(U"{:.0f}"_fmt(cookies)).drawAt(60, 170, 100);
+		// クリック数を整数で表示する
+		font(U"{:.0f}"_fmt(cookies)).drawAt(60, Scene::Center().x, Scene::Center().y / 4);
 
-		// クッキーを描画する
-		texture.scaled(cookieScale).drawAt(cookieCircle.center);
+		// 描画する
+		texture.scaled(texture_size).drawAt(texture_cricle.center);
 	}
 }
 #endif
