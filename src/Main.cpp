@@ -1,5 +1,6 @@
 ﻿# include <Siv3D.hpp> // OpenSiv3D v0.6.2
 
+#if 0
 struct StarEffect : IEffect
 {
 	static constexpr Vec2 Gravity{ 0, 160 };
@@ -70,3 +71,57 @@ void Main()
 		effect.update();
 	}
 }
+#else
+# include <Siv3D.hpp>
+
+void Main()
+{
+	// クッキーの絵文字
+	const Texture texture{ U"example/planet05.png" };
+
+	// フォント
+	const Font font{ FontMethod::MSDF, 48, Typeface::Bold };
+
+	// クッキーのクリック円
+	const Circle cookieCircle{ 170, 300, 100 };
+
+	// クッキーの表示サイズ（倍率）
+	double cookieScale = 0.1;
+
+	// クッキーの個数
+	double cookies = 0;
+
+	while (System::Update())
+	{
+		// クッキー円上にマウスカーソルがあれば
+		if (cookieCircle.mouseOver())
+		{
+			Cursor::RequestStyle(CursorStyle::Hand);
+		}
+
+		// クッキー円が左クリックされたら
+		if (cookieCircle.leftClicked())
+		{
+			cookieScale = 0.1;
+			++cookies;
+		}
+
+		// クッキーの表示サイズを回復する
+		cookieScale += Scene::DeltaTime();
+
+		if (0.3 < cookieScale)
+		{
+			cookieScale = 0.3;
+		}
+
+		// 背景を描く
+		Rect{ 0, 0, 800, 600 }.draw(Arg::top = ColorF{ 0.6, 0.5, 0.3 }, Arg::bottom = ColorF{ 0.2, 0.5, 0.3 });
+
+		// クッキーの数を整数で表示する
+		font(U"{:.0f}"_fmt(cookies)).drawAt(60, 170, 100);
+
+		// クッキーを描画する
+		texture.scaled(cookieScale).drawAt(cookieCircle.center);
+	}
+}
+#endif
