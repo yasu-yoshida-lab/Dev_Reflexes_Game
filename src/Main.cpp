@@ -1,6 +1,5 @@
 ﻿# include <Siv3D.hpp> // OpenSiv3D v0.6.2
 
-#if 0
 struct StarEffect : IEffect
 {
 	static constexpr Vec2 Gravity{ 0, 160 };
@@ -49,85 +48,40 @@ struct StarEffect : IEffect
 
 void Main()
 {
-	Effect effect;
-	Circle circle{ Scene::Center(), 30 };
-	double baseHue = 180.0;
-
-	while (System::Update())
-	{
-		if (circle.mouseOver())
-		{
-			Cursor::RequestStyle(CursorStyle::Hand);
-		}
-
-		if (circle.leftClicked())
-		{
-			effect.add<StarEffect>(Cursor::PosF(), baseHue);
-			circle.center = RandomVec2(Scene::Rect().stretched(-80));
-			baseHue = Random(0.0, 360.0);
-		}
-
-		circle.draw(HSV{ baseHue });
-		effect.update();
-	}
-}
-#else
-# include <Siv3D.hpp>
-
-void Main()
-{
 	Scene::SetResizeMode(ResizeMode::Keep);
 	Window::SetStyle(WindowStyle::Sizable);
+
 	// テクスチャー
-	const Texture texture{ U"example/planet05.png" };
+	const Texture texture{ U"👾"_emoji };
 
 	// フォント
 	const Font font{ FontMethod::MSDF, 48, Typeface::Bold };
 
 	// テクスチャークリック範囲
-	const Circle texture_cricle{ Scene::Center().x, Scene::Center().y, 100};
+	Circle texture_cricle{ Scene::Center().x, Scene::Center().y, 80};
 
-	//表示サイズ（倍率）
-	double texture_size = 0.1;
+	/* エフェクト */
+	Effect effect;
 
-	// クッキーの個数
-	double cookies = 0;
+	double baseHue = 180.0;
 
-	while (System::Update())
-	{
+	while (System::Update()) {
 		if (KeyF11.up() == true) {
 			Window::SetFullscreen( ( Window::GetState().fullscreen == false ? true : false) );
 		}
 
-		// 円上にマウスカーソルがあれば
-		if (texture_cricle.mouseOver())
-		{
+		if (texture_cricle.mouseOver()) {
 			Cursor::RequestStyle(CursorStyle::Hand);
 		}
 
-		// 左クリックされたら
-		if (texture_cricle.leftClicked())
-		{
-			texture_size = 0.1;
-			++cookies;
+		if (texture_cricle.leftClicked()) {
+			effect.add<StarEffect>(Cursor::PosF(), baseHue);
+			texture_cricle.center = RandomVec2(Scene::Rect().stretched(-80));
+			baseHue = Random(0.0, 360.0);
 		}
-
-		// 表示サイズを回復する
-		texture_size += Scene::DeltaTime();
-
-		if (0.3 < texture_size)
-		{
-			texture_size = 0.3;
-		}
-
-		// 背景を描く
-		Rect{ 0, 0, 800, 600 }.draw(Arg::top = ColorF{ 0.6, 0.5, 0.3 }, Arg::bottom = ColorF{ 0.2, 0.5, 0.3 });
-
-		// クリック数を整数で表示する
-		font(U"{:.0f}"_fmt(cookies)).drawAt(60, Scene::Center().x, Scene::Center().y / 4);
-
+	
 		// 描画する
-		texture.scaled(texture_size).drawAt(texture_cricle.center);
+		texture.scaled(1.0).drawAt(texture_cricle.center);
+		effect.update();
 	}
 }
-#endif
